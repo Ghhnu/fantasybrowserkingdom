@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fantasy Browser Kingdom</title>
+
+  <!-- Icono de la pestaña del navegador y al guardar la web (encabezado.png) -->
+  <link rel="icon" type="image/png" href="encabezado.png">
+  <link rel="shortcut icon" type="image/png" href="encabezado.png">
+  <link rel="apple-touch-icon" href="encabezado.png">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    /* ---------- ESTILO BASICO ---------- */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #262626;
+      color: #ffffff;
+      font-family: "Press Start 2P", monospace;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 10px;
+      color: #ffd23f;
+    }
+
+    h2 {
+      font-size: 12px;
+      margin: 0 0 15px;
+      color: #4da6ff;
+    }
+
+    h3 {
+      font-size: 12px;
+      margin: 0 0 12px;
+      color: #ffd23f;
+    }
+
+    p {
+      margin: 0 0 10px;
+      color: #cccccc;
+    }
+
+    label {
+      color: #5fd35f;
+    }
+
+    select, input, button {
+      font-family: inherit;
+      font-size: 12px;
+      color: #ffffff;
+      background: #262626;
+      border: 2px solid #ffffff;
+      padding: 8px;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* ---------- PANTALLA DE CARGA ---------- */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #262626;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    /* Cuando termina de cargar, se oculta suavemente */
+    #loading.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #loading img {
+      max-width: 40vw;
+      max-height: 40vh;
+      width: auto;
+      height: auto;
+    }
+
+    /* Texto de respaldo por si no se encuentra loading.gif */
+    #loadingText {
+      display: none;
+      color: #ffd23f;
+    }
+
+    /* ---------- INTRO: LOGO SOBRE LA WEB DIFUMINADA ---------- */
+    #intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(38, 38, 38, 0.35);
+      transition: opacity 0.8s ease;
+    }
+
+    #intro img {
+      max-width: 60vw;
+      max-height: 50vh;
+      width: auto;
+      height: auto;
+      transition: transform 0.8s ease, opacity 0.8s ease;
+    }
+
+    /* Animacion de salida: el logo crece y se desvanece */
+    #intro.leave {
+      opacity: 0;
+    }
+
+    #intro.leave img {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+
+    /* La web empieza difuminada y se va enfocando poco a poco */
+    #site {
+      filter: blur(0);
+      transition: filter 0.8s ease;
+    }
+
+    #site.blurred {
+      filter: blur(8px);
+    }
+
+    /* ---------- BARRA DE NAVEGACION ---------- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: #1a1a1a;
+      border-bottom: 3px solid #ffd23f;
+    }
+
+    .nav__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: transparent;
+      border: 2px solid transparent;
+      color: #cccccc;
+      font-size: 10px;
+    }
+
+    .nav__item:hover {
+      background: #333333;
+      color: #ffffff;
+    }
+
+    .nav__item.active {
+      border-color: #ffd23f;
+      color: #ffd23f;
+    }
+
+    .nav__brand {
+      color: #ffd23f;
+      border-color: transparent;
+    }
+
+    .nav__spacer {
+      flex: 1;
+    }
+
+    .nav__icon {
+      font-size: 16px;
+    }
+
+    .nav__icon img {
+      display: block;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    /* ---------- PANTALLAS ---------- */
+    /* Solo se ve la pantalla que tenga la clase "visible" */
+    .screen {
+      display: none;
+    }
+
+    .screen.visible {
+      display: block;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ---------- CABECERA (HOME) ---------- */
+    header {
+      border: 3px solid #ffd23f;
+      background: linear-gradient(135deg, #3a2a10 0%, #1a1a1a 60%, #10253a 100%);
+      padding: 25px;
+      margin-bottom: 25px;
+    }
+
+    .header__container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+    }
+
+    .header__main {
+      flex: 1 1 280px;
+    }
+
+    .header__side {
+      flex: 1 1 280px;
+    }
+
+    .header__subtitle {
+      color: #cccccc;
+      margin-bottom: 20px;
+    }
+
+    /* Botones grandes del menu */
+    .header__menu {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .menu-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 8px;
+      font-size: 11px;
+      background: #1a1a1a;
+      text-align: center;
+    }
+
+    .menu-button .icon {
+      font-size: 28px;
+    }
+
+    .menu-button .icon img {
+      display: block;
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    #menuCalc { color: #4da6ff; border-color: #4da6ff; }  /* Calculator = azul */
+    #menuMap  { color: #5fd35f; border-color: #5fd35f; }  /* Game Map = verde */
+
+    .menu-button:hover {
+      background: #333333;
+    }
+
+    .lang-row {
+      margin-bottom: 15px;
+    }
+
+    /* ---------- SECCIONES (HOME) ---------- */
+    .article {
+      display: block;
+    }
+
+    /* Caja que agrupa cada parte */
+    .box {
+      border: 2px solid #ffffff;
+      background: #2e2e2e;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .article .box {
+      margin-bottom: 0;
+    }
+
+    /* ---------- FLECHA PARA VOLVER ---------- */
+    .back {
+      margin-bottom: 20px;
+      color: #ffd23f;
+      border-color: #ffd23f;
+    }
+
+    /* ---------- CALCULADORA ---------- */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tabs button {
+      flex: 1 1 auto;
+    }
+
+    /* Colores de cada pestaña */
+    #tab1 { color: #4da6ff; border-color: #4da6ff; }  /* Level = azul */
+    #tab2 { color: #5fd35f; border-color: #5fd35f; }  /* Skill = verde */
+    #tab3 { color: #ffb347; border-color: #ffb347; }  /* XP → Level = naranja */
+
+    /* Pestaña activa: se rellena con su color */
+    #tab1.active { background: #4da6ff; color: #262626; }
+    #tab2.active { background: #5fd35f; color: #262626; }
+    #tab3.active { background: #ffb347; color: #262626; }
+
+    /* Cada linea de resultado */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #555555;
+    }
+
+    /* Nombre de cada resultado en gris claro y el valor en amarillo */
+    .row span:first-child {
+      color: #cccccc;
+    }
+
+    .row span:last-child {
+      color: #ffd23f;
+      text-align: right;
+    }
+
+    .error {
+      color: #ff6666;
+      margin-top: 10px;
+    }
+
+    /* ---------- GAME MAP ---------- */
+    .soon {
+      text-align: center;
+      color: #5fd35f;
+      font-size: 16px;
+      padding: 30px 0;
+    }
+
+    /* ---------- PIE DE PAGINA ---------- */
+    footer {
+      text-align: center;
+      font-size: 8px;
+      color: #888888;
+      padding: 20px;
+      border-top: 2px solid #3a3a3a;
+      margin-top: 20px;
+    }
+
+    /* ---------- ADAPTACION A MOVIL ---------- */
+    @media (max-width: 600px) {
+      /* En movil la barra solo muestra los iconos */
+      .nav__text {
+        display: none;
+      }
+
+      .nav__item {
+        padding: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        font-size: 10px;
+      }
+
+      main {
+        padding: 12px;
+      }
+
+      h1 { font-size: 14px; }
+      h2, h3 { font-size: 10px; }
+
+      select, input, button {
+        font-size: 10px;
+      }
+
+      header {
+        padding: 15px;
+      }
+
+      .menu-button {
+        font-size: 9px;
+      }
+
+      .box {
+        padding: 10px;
+      }
+
+      /* En movil, las pestañas ocupan una linea cada una */
+      .tabs button {
+        flex: 1 1 100%;
+      }
+
+      /* En movil, cada resultado se apila: nombre arriba, valor debajo */
+      .row {
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .row span:last-child {
+        text-align: left;
+      }
+    }
+
+    /* ---------- ADAPTACION A TABLET Y PC ---------- */
+    @media (min-width: 768px) {
+      body {
+        font-size: 13px;
+      }
+
+      main {
+        padding: 30px;
+      }
+
+      h1 { font-size: 24px; }
+      h2, h3 { font-size: 14px; }
+
+      select, input, button {
+        font-size: 13px;
+      }
+
+      .nav__item {
+        font-size: 12px;
+      }
+
+      .menu-button {
+        font-size: 13px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ========== PANTALLA DE CARGA ========== -->
+  <div id="loading">
+    <!-- loading.gif debe estar en la misma carpeta que este archivo (index.html) -->
+    <img id="loadingImg" src="loading.gif" alt="Loading" onerror="this.style.display='none'; document.getElementById('loadingText').style.display='block';">
+    <div id="loadingText">Loading...</div>
+  </div>
+
+  <!-- ========== INTRO: LOGO SOBRE LA WEB DIFUMINADA ========== -->
+  <div id="intro">
+    <img id="introLogo" src="logo.png" alt="" onerror="this.style.display='none';">
+  </div>
+
+  <!-- Todo el contenido de la web va dentro de #site (empieza difuminado) -->
+  <div id="site" class="blurred">
+
+  <!-- ========== BARRA DE NAVEGACION ========== -->
+  <nav>
+    <button class="nav__item nav__brand" id="navHome" title="Home">
+      <span class="nav__icon"><img id="navHomeImg" src="casa.png" alt=""></span>
+      <span class="nav__text" id="navBrand"></span>
+    </button>
+
+    <div class="nav__spacer"></div>
+
+    <button class="nav__item" id="navCalc">
+      <span class="nav__icon"><img id="navCalcImg" src="calculatorlogo.png" alt=""></span>
+      <span class="nav__text" id="navCalcText"></span>
+    </button>
+    <button class="nav__item" id="navMap">
+      <span class="nav__icon"><img id="navMapImg" src="maplogo.png" alt=""></span>
+      <span class="nav__text" id="navMapText"></span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ========== PANTALLA 1: MENU PRINCIPAL ========== -->
+    <section id="screenMenu" class="screen visible">
+      <header>
+        <div class="header__container">
+          <div class="header__main">
+            <h1 id="menuTitle"></h1>
+            <div class="header__subtitle" id="menuSubtitle"></div>
+
+            <!-- Selector de idioma (solo aqui) -->
+            <div class="lang-row">
+              <select id="lang">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="pt">Português</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="header__side">
+            <div class="header__menu">
+              <button id="menuCalc" class="menu-button">
+                <span class="icon"><img src="calculatorlogo.png" alt=""></span>
+                <span id="menuCalcText"></span>
+              </button>
+              <button id="menuMap" class="menu-button">
+                <span class="icon"><img src="maplogo.png" alt=""></span>
+                <span id="menuMapText"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="article">
+        <div class="box">
+          <h3 id="aboutTitle"></h3>
+          <p id="aboutText"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PANTALLA 2: CALCULADORA ========== -->
+    <section id="screenCalc" class="screen">
+      <button id="backCalc" class="back">&larr;</button>
+
+      <h1 id="title"></h1>
+
+      <!-- Pestañas -->
+      <div class="tabs">
+        <button id="tab1"></button>
+        <button id="tab2"></button>
+        <button id="tab3"></button>
+      </div>
+
+      <!-- Entrada de numero -->
+      <div class="box">
+        <label id="label" for="input"></label>
+        <input id="input" type="number" value="150" min="1">
+        <div class="error" id="error"></div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="box">
+        <h2 id="resultTitle"></h2>
+        <div id="results"></div>
+      </div>
+    </section>
+
+    <!-- ========== PANTALLA 3: GAME MAP ========== -->
+    <section id="screenMap" class="screen">
+      <button id="backMap" class="back">&larr;</button>
+
+      <h1 id="mapTitle"></h1>
+
+      <div class="box">
+        <div class="soon" id="soon"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2026 Fantasy Browser Kingdom &middot; Made by ghhnu
+  </footer>
+
+  </div><!-- fin de #site -->
+
+  <script>
+    // ---------- PANTALLA DE CARGA ----------
+    var loadStart = Date.now();
+    var MIN_LOADING_TIME = 1000; // la pantalla de carga se ve al menos 1 segundo
+
+    var loadingDone = false;
+
+    function hideLoading() {
+      if (loadingDone) return;
+      loadingDone = true;
+
+      var wait = Math.max(0, MIN_LOADING_TIME - (Date.now() - loadStart));
+      setTimeout(function () {
+        // 1) Se quita la pantalla de carga (tarda 0.4 s en desvanecerse)
+        document.getElementById("loading").className = "hidden";
+
+        // 2) El logo se queda 1 segundo sobre la web difuminada
+        setTimeout(playIntro, 400 + 1000);
+      }, wait);
+    }
+
+    // 3) Animacion final: el logo desaparece y la web se enfoca
+    function playIntro() {
+      document.getElementById("intro").className = "leave";
+      document.getElementById("site").className = "";
+
+      setTimeout(function () {
+        document.getElementById("intro").style.display = "none";
+        document.getElementById("site").style.filter = "none";
+      }, 900);
+    }
+
+    // Se oculta cuando la web termina de cargar (imagenes, fuentes, etc.)
+    window.addEventListener("load", hideLoading);
+
+    // Por seguridad, se oculta igualmente tras 10 segundos
+    setTimeout(hideLoading, 10000);
+
+    // ---------- DATOS Y FORMULAS ----------
+    var MAX_LEVEL = 1500;
+    var MAX_SKILL = 1000;
+
+    // XP total necesaria para un nivel
+    function xpLevel(n) {
+      if (n <= 1) return 0;
+      return Math.floor(Math.pow(n, 3 + n / 1000));
+    }
+
+    // XP total necesaria para una habilidad
+    function xpSkill(n) {
+      if (n <= 1) return 0;
+      return Math.floor(Math.pow(1.5 * n, 2 + n / 1000));
+    }
+
+    // Dado un XP total, busca el nivel mas alto que se alcanza
+    function findLevel(xp, max, xpFunction) {
+      var low = 1;
+      var high = max;
+      while (low < high) {
+        var mid = Math.floor((low + high + 1) / 2);
+        if (xpFunction(mid) <= xp) {
+          low = mid;
+        } else {
+          high = mid - 1;
+        }
+      }
+      return low;
+    }
+
+    // Velocidad base segun el nivel
+    function baseSpeed(level) {
+      return level - 1 + 110;
+    }
+
+    // Tiempo que tarda cada paso (suelo 150)
+    function stepTime(speed) {
+      var t = 1;
+      if (speed > -261.29) {
+        t = Math.max(1, Math.floor(857.36 * Math.log(speed + 261.29) - 4795.01 + 0.5));
+      }
+      return 50 * Math.ceil(Math.floor(1000 * 150 / t) / 50) / 1000;
+    }
+
+    // ---------- TEXTOS EN CADA IDIOMA ----------
+    var texts = {
+      en: {
+        locale: "en-US",
+        siteTitle: "Fantasy Browser Kingdom",
+        navBrand: "Home",
+        subtitle: "Tools and information for the game, all in one place.",
+        menuCalc: "Calculator",
+        menuMap: "Game Map",
+        aboutTitle: "About",
+        aboutText: "Welcome to Fantasy Browser Kingdom. Pick an option above to get started.",
+        loading: "Loading...",
+        soon: "Soon...",
+        title: "Level calculator",
+        tabs: ["Level", "Skill", "XP → Level"],
+        labels: ["Level (1 - 1500)", "Skill level (1 - 1000)", "Total XP"],
+        resultTitles: ["Level info", "Skill info", "Result"],
+        invalid: "Enter a valid whole number.",
+        maxLevelError: "The maximum level is 1500.",
+        maxSkillError: "The maximum skill is 1000.",
+        max: "Max",
+        totalXp: "Total XP required",
+        fromPrevLevel: "XP from previous level",
+        toNextLevel: "XP to next level",
+        nextTotal: "Total XP of next level",
+        exponent: "Exponent",
+        speed: "Base speed",
+        stepTime: "Time per step",
+        stepsPerSecond: "Steps per second",
+        fromPrevSkill: "XP from previous skill",
+        toNextSkill: "XP to next skill",
+        levelReached: "Level reached",
+        levelLeft: "XP left to next level",
+        skillReached: "Skill reached",
+        skillLeft: "XP left to next skill"
+      },
+      es: {
+        locale: "es-ES",
+        siteTitle: "Fantasy Browser Kingdom",
+        navBrand: "Inicio",
+        subtitle: "Herramientas e información del juego, todo en un solo lugar.",
+        menuCalc: "Calculadora",
+        menuMap: "Mapa del juego",
+        aboutTitle: "Acerca de",
+        aboutText: "Bienvenido a Fantasy Browser Kingdom. Elige una opción de arriba para empezar.",
+        loading: "Cargando...",
+        soon: "Pronto...",
+        title: "Calculadora de nivel",
+        tabs: ["Nivel", "Habilidad", "XP → Nivel"],
+        labels: ["Nivel (1 - 1500)", "Nivel de habilidad (1 - 1000)", "XP total"],
+        resultTitles: ["Información del nivel", "Información de la habilidad", "Resultado"],
+        invalid: "Introduce un número entero válido.",
+        maxLevelError: "El nivel máximo es 1500.",
+        maxSkillError: "La habilidad máxima es 1000.",
+        max: "Máximo",
+        totalXp: "XP total necesaria",
+        fromPrevLevel: "XP desde el nivel anterior",
+        toNextLevel: "XP para el siguiente nivel",
+        nextTotal: "XP total del siguiente nivel",
+        exponent: "Exponente",
+        speed: "Velocidad base",
+        stepTime: "Tiempo por paso",
+        stepsPerSecond: "Pasos por segundo",
+        fromPrevSkill: "XP desde la habilidad anterior",
+        toNextSkill: "XP para la siguiente habilidad",
+        levelReached: "Nivel alcanzado",
+        levelLeft: "XP restante al siguiente nivel",
+        skillReached: "Habilidad alcanzada",
+        skillLeft: "XP restante a la siguiente habilidad"
+      },
+      pt: {
+        locale: "pt-BR",
+        siteTitle: "Fantasy Browser Kingdom",
+        navBrand: "Início",
+        subtitle: "Ferramentas e informações do jogo, tudo em um só lugar.",
+        menuCalc: "Calculadora",
+        menuMap: "Mapa do jogo",
+        aboutTitle: "Sobre",
+        aboutText: "Bem-vindo ao Fantasy Browser Kingdom. Escolha uma opção acima para começar.",
+        loading: "Carregando...",
+        soon: "Em breve...",
+        title: "Calculadora de nível",
+        tabs: ["Nível", "Habilidade", "XP → Nível"],
+        labels: ["Nível (1 - 1500)", "Nível de habilidade (1 - 1000)", "XP total"],
+        resultTitles: ["Informações do nível", "Informações da habilidade", "Resultado"],
+        invalid: "Digite um número inteiro válido.",
+        maxLevelError: "O nível máximo é 1500.",
+        maxSkillError: "A habilidade máxima é 1000.",
+        max: "Máximo",
+        totalXp: "XP total necessário",
+        fromPrevLevel: "XP desde o nível anterior",
+        toNextLevel: "XP para o próximo nível",
+        nextTotal: "XP total do próximo nível",
+        exponent: "Expoente",
+        speed: "Velocidade base",
+        stepTime: "Tempo por passo",
+        stepsPerSecond: "Passos por segundo",
+        fromPrevSkill: "XP desde a habilidade anterior",
+        toNextSkill: "XP para a próxima habilidade",
+        levelReached: "Nível alcançado",
+        levelLeft: "XP restante para o próximo nível",
+        skillReached: "Habilidade alcançada",
+        skillLeft: "XP restante para a próxima habilidade"
+      }
+    };
+
+    // ---------- ESTADO ----------
+    var language = "en";      // idioma por defecto
+    var mode = 1;             // 1 = Nivel, 2 = Habilidad, 3 = XP → Nivel
+    var currentScreen = "screenMenu";
+
+    // ---------- AYUDAS ----------
+    function t(key) {
+      return texts[language][key];
+    }
+
+    function el(id) {
+      return document.getElementById(id);
+    }
+
+    // Formatea un numero con separadores de miles
+    function format(n) {
+      return n.toLocaleString(texts[language].locale);
+    }
+
+    // Formatea un numero con decimales fijos
+    function decimals(n, d) {
+      return n.toLocaleString(texts[language].locale, {
+        minimumFractionDigits: d,
+        maximumFractionDigits: d
+      });
+    }
+
+    // Crea las lineas de resultado a partir de una lista [nombre, valor]
+    function makeRows(list) {
+      var html = "";
+      for (var i = 0; i < list.length; i++) {
+        html += '<div class="row"><span>' + list[i][0] + "</span><span>" + list[i][1] + "</span></div>";
+      }
+      return html;
+    }
+
+    // ---------- CAMBIAR DE PANTALLA ----------
+    function showScreen(id) {
+      currentScreen = id;
+
+      var screens = document.querySelectorAll(".screen");
+      for (var i = 0; i < screens.length; i++) {
+        screens[i].className = "screen";
+      }
+      el(id).className = "screen visible";
+
+      // Marcar en la barra la opcion que esta abierta
+      el("navHome").className = "nav__item nav__brand" + (id === "screenMenu" ? " active" : "");
+      el("navCalc").className = "nav__item" + (id === "screenCalc" ? " active" : "");
+      el("navMap").className = "nav__item" + (id === "screenMap" ? " active" : "");
+
+      window.scrollTo(0, 0);
+    }
+
+    // ---------- PINTAR TEXTOS ----------
+    function updateTexts() {
+      document.documentElement.lang = language;
+      document.title = t("siteTitle");
+
+      // Barra de navegacion
+      el("navBrand").textContent = t("navBrand");
+      el("navCalcText").textContent = t("menuCalc");
+      el("navMapText").textContent = t("menuMap");
+      el("navHome").title = t("navBrand");
+      el("navCalc").title = t("menuCalc");
+      el("navMap").title = t("menuMap");
+
+      // Menu
+      el("menuTitle").textContent = t("siteTitle");
+      el("menuSubtitle").textContent = t("subtitle");
+      el("menuCalcText").textContent = t("menuCalc");
+      el("menuMapText").textContent = t("menuMap");
+      el("aboutTitle").textContent = t("aboutTitle");
+      el("aboutText").textContent = t("aboutText");
+
+      // Textos alternativos de las imagenes (tambien en su idioma)
+      el("navHomeImg").alt = t("navBrand");
+      el("navCalcImg").alt = t("menuCalc");
+      el("navMapImg").alt = t("menuMap");
+      el("introLogo").alt = t("siteTitle");
+      el("loadingImg").alt = t("loading");
+      el("loadingText").textContent = t("loading");
+
+      // Game Map
+      el("mapTitle").textContent = t("menuMap");
+      el("soon").textContent = t("soon");
+
+      // Calculadora
+      el("title").textContent = t("title");
+
+      for (var i = 1; i <= 3; i++) {
+        el("tab" + i).textContent = t("tabs")[i - 1];
+        el("tab" + i).className = (i === mode) ? "active" : "";
+      }
+
+      el("label").textContent = t("labels")[mode - 1];
+      el("resultTitle").textContent = t("resultTitles")[mode - 1];
+    }
+
+    // ---------- CALCULAR Y MOSTRAR ----------
+    function calculate() {
+      var value = Number(el("input").value);
+      var results = el("results");
+      el("error").textContent = "";
+      results.innerHTML = "";
+
+      // Comprobar que sea un entero valido
+      if (!Number.isInteger(value) || value < 1) {
+        el("error").textContent = t("invalid");
+        return;
+      }
+
+      if (mode === 1) {
+        // ----- NIVEL -----
+        if (value > MAX_LEVEL) {
+          el("error").textContent = t("maxLevelError");
+          return;
+        }
+
+        var xp = xpLevel(value);
+        var prev = xpLevel(value - 1);
+        var next = (value < MAX_LEVEL) ? xpLevel(value + 1) : null;
+        var speed = baseSpeed(value);
+        var step = stepTime(speed);
+
+        results.innerHTML = makeRows([
+          [t("totalXp"), format(xp)],
+          [t("fromPrevLevel"), value > 1 ? format(xp - prev) : "-"],
+          [t("toNextLevel"), next !== null ? format(next - xp) : t("max")],
+          [t("nextTotal"), next !== null ? format(next) : "-"],
+          [t("exponent"), decimals(3 + value / 1000, 3)],
+          [t("speed"), format(speed)],
+          [t("stepTime"), decimals(step, 2) + " s"],
+          [t("stepsPerSecond"), decimals(1 / step, 2)]
+        ]);
+
+      } else if (mode === 2) {
+        // ----- HABILIDAD -----
+        if (value > MAX_SKILL) {
+          el("error").textContent = t("maxSkillError");
+          return;
+        }
+
+        var xp2 = xpSkill(value);
+        var prev2 = xpSkill(value - 1);
+        var next2 = (value < MAX_SKILL) ? xpSkill(value + 1) : null;
+
+        results.innerHTML = makeRows([
+          [t("totalXp"), format(xp2)],
+          [t("fromPrevSkill"), value > 1 ? format(xp2 - prev2) : "-"],
+          [t("toNextSkill"), next2 !== null ? format(next2 - xp2) : t("max")],
+          [t("exponent"), decimals(2 + value / 1000, 3)]
+        ]);
+
+      } else {
+        // ----- XP → NIVEL -----
+        var level = findLevel(value, MAX_LEVEL, xpLevel);
+        var skill = findLevel(value, MAX_SKILL, xpSkill);
+
+        results.innerHTML = makeRows([
+          [t("levelReached"), format(level)],
+          [t("levelLeft"), level < MAX_LEVEL ? format(xpLevel(level + 1) - value) : "-"],
+          [t("skillReached"), format(skill)],
+          [t("skillLeft"), skill < MAX_SKILL ? format(xpSkill(skill + 1) - value) : "-"]
+        ]);
+      }
+    }
+
+    // ---------- EVENTOS ----------
+    function setMode(newMode) {
+      mode = newMode;
+      var defaults = [0, 150, 100, 7156280]; // valor inicial de cada pestaña
+      el("input").value = defaults[newMode];
+      updateTexts();
+      calculate();
+    }
+
+    // Botones grandes del menu
+    el("menuCalc").onclick = function () { showScreen("screenCalc"); };
+    el("menuMap").onclick = function () { showScreen("screenMap"); };
+
+    // Botones de la barra de navegacion
+    el("navHome").onclick = function () { showScreen("screenMenu"); };
+    el("navCalc").onclick = function () { showScreen("screenCalc"); };
+    el("navMap").onclick = function () { showScreen("screenMap"); };
+
+    // Flechas para volver al menu
+    el("backCalc").onclick = function () { showScreen("screenMenu"); };
+    el("backMap").onclick = function () { showScreen("screenMenu"); };
+
+    // Pestañas de la calculadora
+    el("tab1").onclick = function () { setMode(1); };
+    el("tab2").onclick = function () { setMode(2); };
+    el("tab3").onclick = function () { setMode(3); };
+
+    // Cambio de idioma
+    el("lang").onchange = function () {
+      language = el("lang").value;
+      updateTexts();
+      calculate();
+    };
+
+    el("input").addEventListener("input", calculate);
+
+    // Arrancar la pagina
+    updateTexts();
+    calculate();
+    showScreen("screenMenu");
+  </script>
+</body>
+</html>
