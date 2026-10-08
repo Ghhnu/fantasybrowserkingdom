@@ -226,6 +226,22 @@
       max-width: 1000px;
       margin: 0 auto;
       padding: 20px;
+      transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Al cambiar de opcion: el contenido se difumina, se desvanece y baja un poco.
+       Al quitar esta clase, la nueva pantalla entra enfocandose y subiendo. */
+    main.switching {
+      opacity: 0;
+      filter: blur(10px);
+      transform: translateY(12px) scale(0.98);
+    }
+
+    /* Si el usuario prefiere menos movimiento, no hay animacion */
+    @media (prefers-reduced-motion: reduce) {
+      main {
+        transition: none;
+      }
     }
 
     /* ---------- CABECERA (HOME) ---------- */
@@ -286,7 +302,6 @@
 
     #menuCalc { color: #4da6ff; border-color: #4da6ff; }  /* Calculator = azul */
     #menuMap  { color: #5fd35f; border-color: #5fd35f; }  /* Game Map = verde */
-    #menuServers { color: #ffb347; border-color: #ffb347; grid-column: 1 / -1; }  /* Servers = naranja */
 
     .menu-button:hover {
       background: #333333;
@@ -372,25 +387,6 @@
       color: #5fd35f;
       font-size: 16px;
       padding: 30px 0;
-    }
-
-    /* ---------- SERVIDORES ---------- */
-    .row.head {
-      border-bottom: 2px solid #ffffff;
-    }
-
-    .row.head span {
-      color: #4da6ff !important;
-    }
-
-    .status {
-      color: #888888;
-      font-size: 0.8em;
-      margin-top: 15px;
-    }
-
-    .status .bad {
-      color: #ff6666;
     }
 
     /* ---------- PIE DE PAGINA ---------- */
@@ -522,10 +518,6 @@
       <span class="nav__icon"><img id="navMapImg" src="maplogo.png" alt=""></span>
       <span class="nav__text" id="navMapText"></span>
     </button>
-    <button class="nav__item" id="navServers">
-      <span class="nav__icon"><img id="navServersImg" src="server.png" alt=""></span>
-      <span class="nav__text" id="navServersText"></span>
-    </button>
   </nav>
 
   <main>
@@ -557,10 +549,6 @@
               <button id="menuMap" class="menu-button">
                 <span class="icon"><img src="maplogo.png" alt=""></span>
                 <span id="menuMapText"></span>
-              </button>
-              <button id="menuServers" class="menu-button">
-                <span class="icon"><img src="server.png" alt=""></span>
-                <span id="menuServersText"></span>
               </button>
             </div>
           </div>
@@ -613,17 +601,6 @@
       </div>
     </section>
 
-    <!-- ========== PANTALLA 4: SERVIDORES ========== -->
-    <section id="screenServers" class="screen">
-      <button id="backServers" class="back">&larr;</button>
-
-      <h1 id="serversTitle"></h1>
-
-      <div class="box">
-        <div id="serversList"></div>
-        <div class="status" id="serversStatus"></div>
-      </div>
-    </section>
   </main>
 
   <footer>
@@ -728,15 +705,6 @@
         aboutText: "Welcome to Fantasy Browser Kingdom. Pick an option above to get started.",
         loading: "Loading...",
         soon: "Soon...",
-        srvTitle: "Servers",
-        colServer: "Server",
-        colPlayers: "Players online",
-        loadingServers: "Loading servers...",
-        noServers: "No servers available.",
-        serversError: "Could not load the servers. Trying again in 5 minutes.",
-        lastUpdate: "Last update",
-        autoNote: "Updates every 5 minutes.",
-        regions: { na: "North America", sa: "South America", eu: "Europe", as: "Asia", asia: "Asia", oc: "Oceania", af: "Africa" },
         title: "Level calculator",
         tabs: ["Level", "Skill", "XP → Level"],
         labels: ["Level (1 - 1500)", "Skill level (1 - 1000)", "Total XP"],
@@ -771,15 +739,6 @@
         aboutText: "Bienvenido a Fantasy Browser Kingdom. Elige una opción de arriba para empezar.",
         loading: "Cargando...",
         soon: "Pronto...",
-        srvTitle: "Servidores",
-        colServer: "Servidor",
-        colPlayers: "Jugadores conectados",
-        loadingServers: "Cargando servidores...",
-        noServers: "No hay servidores disponibles.",
-        serversError: "No se pudieron cargar los servidores. Se reintentará en 5 minutos.",
-        lastUpdate: "Última actualización",
-        autoNote: "Se actualiza cada 5 minutos.",
-        regions: { na: "América del Norte", sa: "América del Sur", eu: "Europa", as: "Asia", asia: "Asia", oc: "Oceanía", af: "África" },
         title: "Calculadora de nivel",
         tabs: ["Nivel", "Habilidad", "XP → Nivel"],
         labels: ["Nivel (1 - 1500)", "Nivel de habilidad (1 - 1000)", "XP total"],
@@ -814,15 +773,6 @@
         aboutText: "Bem-vindo ao Fantasy Browser Kingdom. Escolha uma opção acima para começar.",
         loading: "Carregando...",
         soon: "Em breve...",
-        srvTitle: "Servidores",
-        colServer: "Servidor",
-        colPlayers: "Jogadores online",
-        loadingServers: "Carregando servidores...",
-        noServers: "Nenhum servidor disponível.",
-        serversError: "Não foi possível carregar os servidores. Tentando novamente em 5 minutos.",
-        lastUpdate: "Última atualização",
-        autoNote: "Atualiza a cada 5 minutos.",
-        regions: { na: "América do Norte", sa: "América do Sul", eu: "Europa", as: "Ásia", asia: "Ásia", oc: "Oceania", af: "África" },
         title: "Calculadora de nível",
         tabs: ["Nível", "Habilidade", "XP → Nível"],
         labels: ["Nível (1 - 1500)", "Nível de habilidade (1 - 1000)", "XP total"],
@@ -885,20 +835,56 @@
     }
 
     // ---------- CAMBIAR DE PANTALLA ----------
-    function showScreen(id) {
+    // Marca en la barra la opcion que esta abierta
+    function markNav(id) {
+      el("navHome").className = "nav__item nav__brand" + (id === "screenMenu" ? " active" : "");
+      el("navCalc").className = "nav__item" + (id === "screenCalc" ? " active" : "");
+      el("navMap").className = "nav__item" + (id === "screenMap" ? " active" : "");
+    }
+
+    // Cambio de pantalla con animacion y difuminado
+    var switchTimer = null;
+
+    function showScreen(id, instant) {
+      var main = document.querySelector("main");
+      clearTimeout(switchTimer);
+
+      // Sin animacion (solo al arrancar la web)
+      if (instant) {
+        currentScreen = id;
+        markNav(id);
+        applyScreen(id);
+        main.className = "";
+        return;
+      }
+
+      // Si ya estamos en esa pantalla, no hace falta cambiar nada
+      if (id === currentScreen) {
+        main.className = "";
+        return;
+      }
+
       currentScreen = id;
+      markNav(id);
+
+      // 1) El contenido actual se difumina y desaparece
+      main.className = "switching";
+
+      // 2) Cuando termina, se cambia la pantalla y el nuevo contenido aparece enfocandose
+      switchTimer = setTimeout(function () {
+        applyScreen(id);
+        main.className = "";
+      }, 300);
+    }
+
+    // Muestra de golpe la pantalla indicada
+    function applyScreen(id) {
 
       var screens = document.querySelectorAll(".screen");
       for (var i = 0; i < screens.length; i++) {
         screens[i].className = "screen";
       }
       el(id).className = "screen visible";
-
-      // Marcar en la barra la opcion que esta abierta
-      el("navHome").className = "nav__item nav__brand" + (id === "screenMenu" ? " active" : "");
-      el("navCalc").className = "nav__item" + (id === "screenCalc" ? " active" : "");
-      el("navMap").className = "nav__item" + (id === "screenMap" ? " active" : "");
-      el("navServers").className = "nav__item" + (id === "screenServers" ? " active" : "");
 
       window.scrollTo(0, 0);
     }
@@ -935,14 +921,6 @@
       // Game Map
       el("mapTitle").textContent = t("menuMap");
       el("soon").textContent = t("soon");
-
-      // Servidores
-      el("navServersText").textContent = t("srvTitle");
-      el("menuServersText").textContent = t("srvTitle");
-      el("navServers").title = t("srvTitle");
-      el("navServersImg").alt = t("srvTitle");
-      el("serversTitle").textContent = t("srvTitle");
-      renderServers();
 
       // Calculadora
       el("title").textContent = t("title");
@@ -1025,89 +1003,6 @@
       }
     }
 
-    // ---------- SERVIDORES ----------
-    var SERVERS_URL = "https://fantasybrowser.io/api/canais";
-    var SERVERS_REFRESH = 5 * 60 * 1000; // cada 5 minutos
-
-    var serversData = null;     // lista de servidores recibida
-    var serversUpdated = null;  // hora de la ultima actualizacion correcta
-    var serversError = false;   // true si la ultima peticion fallo
-
-    // Evita que un nombre con simbolos rompa la pagina
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    // Nombre del servidor en el idioma elegido (region + numero)
-    function serverName(c) {
-      var name = String(c.name || "");
-      var number = name.match(/(\d+)\s*$/);
-      var region = texts[language].regions[c.region];
-      if (region && number) {
-        return region + " " + number[1];
-      }
-      return name || ("#" + c.id);
-    }
-
-    // Dibuja la lista de servidores y el estado
-    function renderServers() {
-      var html = "";
-
-      if (serversData) {
-        html += '<div class="row head"><span>' + t("colServer") + "</span><span>" + t("colPlayers") + "</span></div>";
-
-        for (var i = 0; i < serversData.length; i++) {
-          var c = serversData[i];
-          var players = Number(c.online);
-          html += '<div class="row"><span>' + escapeHtml(serverName(c)) + "</span><span>" +
-                  (isNaN(players) ? "-" : format(players)) + "</span></div>";
-        }
-
-        if (serversData.length === 0) {
-          html += "<p>" + t("noServers") + "</p>";
-        }
-      } else if (!serversError) {
-        html = "<p>" + t("loadingServers") + "</p>";
-      }
-
-      el("serversList").innerHTML = html;
-
-      // Linea de estado
-      var status = "";
-      if (serversError) {
-        status += '<div class="bad">' + t("serversError") + "</div>";
-      }
-      if (serversUpdated) {
-        status += "<div>" + t("lastUpdate") + ": " + serversUpdated.toLocaleTimeString(texts[language].locale) + "</div>";
-      }
-      status += "<div>" + t("autoNote") + "</div>";
-      el("serversStatus").innerHTML = status;
-    }
-
-    // Pide los datos a la API
-    function loadServers() {
-      fetch(SERVERS_URL, { cache: "no-store" })
-        .then(function (response) {
-          if (!response.ok) throw new Error("HTTP " + response.status);
-          return response.json();
-        })
-        .then(function (data) {
-          if (!data || !Array.isArray(data.canais)) throw new Error("Bad data");
-          serversData = data.canais;
-          serversUpdated = new Date();
-          serversError = false;
-          renderServers();
-        })
-        .catch(function () {
-          serversError = true;
-          renderServers();
-        });
-    }
-
     // ---------- EVENTOS ----------
     function setMode(newMode) {
       mode = newMode;
@@ -1120,18 +1015,15 @@
     // Botones grandes del menu
     el("menuCalc").onclick = function () { showScreen("screenCalc"); };
     el("menuMap").onclick = function () { showScreen("screenMap"); };
-    el("menuServers").onclick = function () { showScreen("screenServers"); };
 
     // Botones de la barra de navegacion
     el("navHome").onclick = function () { showScreen("screenMenu"); };
     el("navCalc").onclick = function () { showScreen("screenCalc"); };
     el("navMap").onclick = function () { showScreen("screenMap"); };
-    el("navServers").onclick = function () { showScreen("screenServers"); };
 
     // Flechas para volver al menu
     el("backCalc").onclick = function () { showScreen("screenMenu"); };
     el("backMap").onclick = function () { showScreen("screenMenu"); };
-    el("backServers").onclick = function () { showScreen("screenMenu"); };
 
     // Pestañas de la calculadora
     el("tab1").onclick = function () { setMode(1); };
@@ -1150,11 +1042,7 @@
     // Arrancar la pagina
     updateTexts();
     calculate();
-    showScreen("screenMenu");
-
-    // Servidores: se piden al abrir la web y despues cada 5 minutos
-    loadServers();
-    setInterval(loadServers, SERVERS_REFRESH);
+    showScreen("screenMenu", true);
   </script>
 </body>
 </html>
