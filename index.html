@@ -71,6 +71,14 @@
       cursor: pointer;
     }
 
+    /* Imagenes nitidas: al agrandar un PNG pequeño no se difumina,
+       se ven los pixeles definidos */
+    img {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+    }
+
     /* ---------- PANTALLA DE CARGA ---------- */
     #loading {
       position: fixed;
@@ -122,10 +130,11 @@
     }
 
     #intro img {
-      max-width: 60vw;
-      max-height: 50vh;
-      width: auto;
+      /* Tamaño fijo para que cualquier logo se vea grande y nitido */
+      width: min(50vw, 300px);
       height: auto;
+      max-height: 50vh;
+      object-fit: contain;
       transition: transform 0.8s ease, opacity 0.8s ease;
     }
 
