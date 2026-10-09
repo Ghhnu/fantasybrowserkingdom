@@ -302,6 +302,7 @@
 
     #menuCalc { color: #4da6ff; border-color: #4da6ff; }  /* Calculator = azul */
     #menuMap  { color: #5fd35f; border-color: #5fd35f; }  /* Game Map = verde */
+    #menuCredits { color: #ffb347; border-color: #ffb347; grid-column: 1 / -1; }  /* Credits = naranja */
 
     .menu-button:hover {
       background: #333333;
@@ -387,6 +388,294 @@
       color: #5fd35f;
       font-size: 16px;
       padding: 30px 0;
+    }
+
+    /* ---------- CREDITOS ---------- */
+    .credit-role {
+      color: #cccccc;
+      margin: 0 0 8px;
+    }
+
+    .credit-name {
+      color: #ffd23f;
+      font-size: 1.4em;
+      margin: 0;
+    }
+
+    /* ---------- ANIMACIONES Y EFECTOS AL PASAR EL CURSOR ---------- */
+
+    /* Suavizar los cambios de todos los controles */
+    button, select, input {
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+                  transform 0.2s ease, box-shadow 0.25s ease;
+    }
+
+    /* Al pulsar, el boton se hunde un poco */
+    button:active {
+      transform: scale(0.95);
+    }
+
+    /* Campo de texto: brilla al seleccionarlo */
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #ffd23f;
+      box-shadow: 0 0 12px rgba(255, 210, 63, 0.45);
+    }
+
+    /* Los iconos (barra y menu) se mueven suavemente */
+    .nav__icon img,
+    .menu-button .icon img {
+      transition: transform 0.25s ease;
+    }
+
+    /* Barra de navegacion: linea que crece bajo el boton */
+    .nav__item {
+      position: relative;
+    }
+
+    .nav__item::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 2px;
+      width: 0;
+      height: 3px;
+      background: #ffd23f;
+      transition: width 0.25s ease, left 0.25s ease;
+    }
+
+    /* Entrada de cada pantalla: los bloques suben uno tras otro */
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .screen.visible > * {
+      animation: rise 0.5s ease both;
+    }
+
+    .screen.visible > *:nth-child(2) { animation-delay: 0.08s; }
+    .screen.visible > *:nth-child(3) { animation-delay: 0.16s; }
+    .screen.visible > *:nth-child(4) { animation-delay: 0.24s; }
+    .screen.visible > *:nth-child(5) { animation-delay: 0.32s; }
+
+    /* Solo en dispositivos con raton (en el movil el "hover" se quedaria pegado) */
+    @media (hover: hover) {
+      /* Botones del menu principal: suben, brillan y el icono se agranda */
+      .menu-button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px -4px currentColor;
+      }
+
+      .menu-button:hover .icon img {
+        transform: scale(1.18) rotate(-4deg);
+      }
+
+      /* Barra de navegacion */
+      .nav__item:hover .nav__icon img {
+        transform: scale(1.2);
+      }
+
+      .nav__item:hover::after {
+        width: 70%;
+        left: 15%;
+      }
+
+      /* Pestañas de la calculadora */
+      .tabs button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px -4px currentColor;
+      }
+
+      /* Flecha de volver: se desliza hacia la izquierda */
+      .back:hover {
+        transform: translateX(-5px);
+        box-shadow: 0 0 10px rgba(255, 210, 63, 0.4);
+      }
+
+      /* Selector de idioma */
+      select:hover {
+        border-color: #ffd23f;
+      }
+
+      /* Cajas: el borde se ilumina */
+      .box:hover {
+        border-color: #ffd23f;
+      }
+
+      /* Lineas de resultado: se resaltan y se desplazan un poco */
+      .row:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateX(4px);
+      }
+    }
+
+    .box,
+    .row {
+      transition: border-color 0.25s ease, background 0.2s ease, transform 0.2s ease;
+    }
+
+    /* ----- MAS ANIMACIONES ----- */
+
+    /* Titulo principal: brillo que respira */
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 0 rgba(255, 210, 63, 0); }
+      50%      { text-shadow: 0 0 14px rgba(255, 210, 63, 0.65); }
+    }
+
+    h1 {
+      animation: glow 3.5s ease-in-out infinite;
+    }
+
+    /* Cabecera: el degradado se mueve despacio */
+    @keyframes drift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    header {
+      background-size: 220% 220%;
+    }
+
+    /* La cabecera combina la entrada (rise) con el degradado en movimiento */
+    .screen.visible > header {
+      animation: rise 0.5s ease both, drift 14s ease-in-out infinite;
+    }
+
+    /* Barra de navegacion: baja desde arriba al cargar */
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    nav {
+      animation: slideDown 0.6s ease both;
+    }
+
+    /* Opcion abierta en la barra: borde que late */
+    @keyframes pulseBorder {
+      0%, 100% { box-shadow: 0 0 0 rgba(255, 210, 63, 0); }
+      50%      { box-shadow: 0 0 10px rgba(255, 210, 63, 0.5); }
+    }
+
+    .nav__item.active {
+      animation: pulseBorder 2.4s ease-in-out infinite;
+    }
+
+    /* Iconos del menu: flotan suavemente (cada uno a su ritmo) */
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+
+    .menu-button .icon {
+      display: block;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    .header__menu .menu-button:nth-child(2) .icon { animation-delay: -1s; }
+    .header__menu .menu-button:nth-child(3) .icon { animation-delay: -2s; }
+
+    /* Resultados: aparecen en cascada al cambiar de pestaña */
+    @keyframes rowIn {
+      from { opacity: 0; transform: translateX(-14px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    #results.animate .row {
+      animation: rowIn 0.4s ease both;
+    }
+
+    #results.animate .row:nth-child(2) { animation-delay: 0.05s; }
+    #results.animate .row:nth-child(3) { animation-delay: 0.10s; }
+    #results.animate .row:nth-child(4) { animation-delay: 0.15s; }
+    #results.animate .row:nth-child(5) { animation-delay: 0.20s; }
+    #results.animate .row:nth-child(6) { animation-delay: 0.25s; }
+    #results.animate .row:nth-child(7) { animation-delay: 0.30s; }
+    #results.animate .row:nth-child(8) { animation-delay: 0.35s; }
+
+    /* Mensaje de error: pequeña sacudida */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .error:not(:empty) {
+      animation: shake 0.4s ease;
+    }
+
+    /* "Soon..." parpadea suavemente */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.35; }
+    }
+
+    .soon {
+      animation: blink 1.8s ease-in-out infinite;
+    }
+
+    /* Onda al hacer clic en un boton */
+    .menu-button,
+    .tabs button,
+    .back {
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes ripple {
+      from { transform: scale(0); opacity: 0.45; }
+      to   { transform: scale(1); opacity: 0; }
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: currentColor;
+      pointer-events: none;
+      animation: ripple 0.6s ease-out forwards;
+    }
+
+    /* Particulas de fondo: cuadrados que suben despacio */
+    #particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0) rotate(0deg); opacity: 0; }
+      15%  { opacity: 0.35; }
+      85%  { opacity: 0.35; }
+      to   { transform: translateY(-110vh) rotate(180deg); opacity: 0; }
+    }
+
+    #particles span {
+      position: absolute;
+      bottom: -20px;
+      background: #ffd23f;
+      animation: floatUp linear infinite;
+    }
+
+    /* Si el dispositivo pide menos movimiento, se desactivan las animaciones */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
     }
 
     /* ---------- PIE DE PAGINA ---------- */
@@ -486,6 +775,9 @@
 
 <body>
 
+  <!-- Particulas decorativas de fondo (se crean con JavaScript) -->
+  <div id="particles"></div>
+
   <!-- ========== PANTALLA DE CARGA ========== -->
   <div id="loading">
     <!-- loading.gif debe estar en la misma carpeta que este archivo (index.html) -->
@@ -518,6 +810,10 @@
       <span class="nav__icon"><img id="navMapImg" src="maplogo.png" alt=""></span>
       <span class="nav__text" id="navMapText"></span>
     </button>
+    <button class="nav__item" id="navCredits">
+      <span class="nav__icon"><img id="navCreditsImg" src="monsters.png" alt=""></span>
+      <span class="nav__text" id="navCreditsText"></span>
+    </button>
   </nav>
 
   <main>
@@ -549,6 +845,10 @@
               <button id="menuMap" class="menu-button">
                 <span class="icon"><img src="maplogo.png" alt=""></span>
                 <span id="menuMapText"></span>
+              </button>
+              <button id="menuCredits" class="menu-button">
+                <span class="icon"><img src="monsters.png" alt=""></span>
+                <span id="menuCreditsText"></span>
               </button>
             </div>
           </div>
@@ -601,6 +901,18 @@
       </div>
     </section>
 
+
+    <!-- ========== PANTALLA 4: CREDITOS ========== -->
+    <section id="screenCredits" class="screen">
+      <button id="backCredits" class="back">&larr;</button>
+
+      <h1 id="creditsTitle"></h1>
+
+      <div class="box">
+        <p class="credit-role" id="creditsRole"></p>
+        <p class="credit-name">Ghhnu</p>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -705,6 +1017,8 @@
         aboutText: "Welcome to Fantasy Browser Kingdom. Pick an option above to get started.",
         loading: "Loading...",
         soon: "Soon...",
+        creditsTitle: "Credits",
+        creditsRole: "Creator of the Fantasy Browser Kingdom website",
         title: "Level calculator",
         tabs: ["Level", "Skill", "XP → Level"],
         labels: ["Level (1 - 1500)", "Skill level (1 - 1000)", "Total XP"],
@@ -739,6 +1053,8 @@
         aboutText: "Bienvenido a Fantasy Browser Kingdom. Elige una opción de arriba para empezar.",
         loading: "Cargando...",
         soon: "Pronto...",
+        creditsTitle: "Créditos",
+        creditsRole: "Creador del sitio web de Fantasy Browser Kingdom",
         title: "Calculadora de nivel",
         tabs: ["Nivel", "Habilidad", "XP → Nivel"],
         labels: ["Nivel (1 - 1500)", "Nivel de habilidad (1 - 1000)", "XP total"],
@@ -773,6 +1089,8 @@
         aboutText: "Bem-vindo ao Fantasy Browser Kingdom. Escolha uma opção acima para começar.",
         loading: "Carregando...",
         soon: "Em breve...",
+        creditsTitle: "Créditos",
+        creditsRole: "Criador do site do Fantasy Browser Kingdom",
         title: "Calculadora de nível",
         tabs: ["Nível", "Habilidade", "XP → Nível"],
         labels: ["Nível (1 - 1500)", "Nível de habilidade (1 - 1000)", "XP total"],
@@ -840,6 +1158,7 @@
       el("navHome").className = "nav__item nav__brand" + (id === "screenMenu" ? " active" : "");
       el("navCalc").className = "nav__item" + (id === "screenCalc" ? " active" : "");
       el("navMap").className = "nav__item" + (id === "screenMap" ? " active" : "");
+      el("navCredits").className = "nav__item" + (id === "screenCredits" ? " active" : "");
     }
 
     // Cambio de pantalla con animacion y difuminado
@@ -921,6 +1240,14 @@
       // Game Map
       el("mapTitle").textContent = t("menuMap");
       el("soon").textContent = t("soon");
+
+      // Creditos
+      el("navCreditsText").textContent = t("creditsTitle");
+      el("menuCreditsText").textContent = t("creditsTitle");
+      el("navCredits").title = t("creditsTitle");
+      el("navCreditsImg").alt = t("creditsTitle");
+      el("creditsTitle").textContent = t("creditsTitle");
+      el("creditsRole").textContent = t("creditsRole");
 
       // Calculadora
       el("title").textContent = t("title");
@@ -1009,21 +1336,29 @@
       var defaults = [0, 150, 100, 7156280]; // valor inicial de cada pestaña
       el("input").value = defaults[newMode];
       updateTexts();
+
+      // Los resultados aparecen en cascada (solo al cambiar de pestaña)
+      el("results").className = "animate";
       calculate();
+      setTimeout(function () { el("results").className = ""; }, 900);
     }
 
     // Botones grandes del menu
     el("menuCalc").onclick = function () { showScreen("screenCalc"); };
     el("menuMap").onclick = function () { showScreen("screenMap"); };
+    el("menuCredits").onclick = function () { showScreen("screenCredits"); };
 
     // Botones de la barra de navegacion
     el("navHome").onclick = function () { showScreen("screenMenu"); };
     el("navCalc").onclick = function () { showScreen("screenCalc"); };
     el("navMap").onclick = function () { showScreen("screenMap"); };
+    el("navCredits").onclick = function () { showScreen("screenCredits"); };
 
     // Flechas para volver al menu
     el("backCalc").onclick = function () { showScreen("screenMenu"); };
     el("backMap").onclick = function () { showScreen("screenMenu"); };
+    el("backCredits").onclick = function () { showScreen("screenMenu"); };
+
 
     // Pestañas de la calculadora
     el("tab1").onclick = function () { setMode(1); };
@@ -1032,10 +1367,50 @@
 
     // Cambio de idioma
     el("lang").onchange = function () {
-      language = el("lang").value;
-      updateTexts();
-      calculate();
+      var main = document.querySelector("main");
+      var newLanguage = el("lang").value;
+
+      // El contenido se difumina, cambian los textos y vuelve a enfocarse
+      main.className = "switching";
+      setTimeout(function () {
+        language = newLanguage;
+        updateTexts();
+        calculate();
+        main.className = "";
+      }, 250);
     };
+
+    // Onda al hacer clic en los botones grandes, pestañas y flechas
+    document.addEventListener("pointerdown", function (e) {
+      var button = e.target.closest ? e.target.closest(".menu-button, .tabs button, .back") : null;
+      if (!button) return;
+
+      var rect = button.getBoundingClientRect();
+      var size = Math.max(rect.width, rect.height) * 2;
+      var wave = document.createElement("span");
+      wave.className = "ripple";
+      wave.style.width = size + "px";
+      wave.style.height = size + "px";
+      wave.style.left = (e.clientX - rect.left - size / 2) + "px";
+      wave.style.top = (e.clientY - rect.top - size / 2) + "px";
+      button.appendChild(wave);
+      setTimeout(function () { wave.remove(); }, 650);
+    });
+
+    // Particulas de fondo (tamaño, posicion y velocidad aleatorios)
+    (function makeParticles() {
+      var box = el("particles");
+      for (var i = 0; i < 14; i++) {
+        var p = document.createElement("span");
+        var size = 4 + Math.floor(Math.random() * 6);
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.animationDuration = (14 + Math.random() * 16) + "s";
+        p.style.animationDelay = (-Math.random() * 30) + "s";
+        box.appendChild(p);
+      }
+    })();
 
     el("input").addEventListener("input", calculate);
 
