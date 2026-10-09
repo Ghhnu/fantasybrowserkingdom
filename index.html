@@ -670,6 +670,56 @@
       animation: floatUp linear infinite;
     }
 
+    /* ----- ANIMACION AL CAMBIAR DE IDIOMA ----- */
+    /* Un panel cruza la pantalla de izquierda a derecha mostrando el idioma nuevo;
+       los textos cambian justo cuando la cubre por completo */
+    #langWipe {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 8000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #262626;
+      border-left: 8px solid #ffd23f;
+      border-right: 8px solid #ffd23f;
+      pointer-events: none;
+      transform: translateX(-100%);
+    }
+
+    #langWipe.run {
+      animation: wipe 1s ease-in-out both;
+      pointer-events: auto;
+    }
+
+    @keyframes wipe {
+      0%   { transform: translateX(-100%); }
+      36%  { transform: translateX(0); }
+      64%  { transform: translateX(0); }
+      100% { transform: translateX(100%); }
+    }
+
+    #langWipe span {
+      color: #ffd23f;
+      font-size: 24px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    #langWipe.run span {
+      animation: langName 1s ease-in-out both;
+    }
+
+    @keyframes langName {
+      0%, 30% { opacity: 0; transform: scale(0.6); }
+      45%     { opacity: 1; transform: scale(1.1); }
+      55%     { opacity: 1; transform: scale(1); }
+      70%, 100% { opacity: 0; transform: scale(1.4); }
+    }
+
     /* Si el dispositivo pide menos movimiento, se desactivan las animaciones */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -777,6 +827,9 @@
 
   <!-- Particulas decorativas de fondo (se crean con JavaScript) -->
   <div id="particles"></div>
+
+  <!-- Panel de la animacion al cambiar de idioma -->
+  <div id="langWipe"><span id="langWipeText"></span></div>
 
   <!-- ========== PANTALLA DE CARGA ========== -->
   <div id="loading">
@@ -1366,18 +1419,44 @@
     el("tab3").onclick = function () { setMode(3); };
 
     // Cambio de idioma
-    el("lang").onchange = function () {
-      var main = document.querySelector("main");
-      var newLanguage = el("lang").value;
+    // Cambio de idioma con animacion: un panel cruza la pantalla y,
+    // cuando esta totalmente cubierta, se cambian los textos
+    var langTimer = null;
 
-      // El contenido se difumina, cambian los textos y vuelve a enfocarse
-      main.className = "switching";
-      setTimeout(function () {
-        language = newLanguage;
-        updateTexts();
-        calculate();
-        main.className = "";
-      }, 250);
+    function applyLanguage(newLanguage) {
+      language = newLanguage;
+      updateTexts();
+      calculate();
+    }
+
+    el("lang").onchange = function () {
+      var select = el("lang");
+      var newLanguage = select.value;
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      clearTimeout(langTimer);
+
+      // Sin animacion si el dispositivo pide menos movimiento
+      if (reduce) {
+        applyLanguage(newLanguage);
+        return;
+      }
+
+      var wipe = el("langWipe");
+      el("langWipeText").textContent = select.options[select.selectedIndex].text;
+
+      // Reiniciar la animacion por si se cambia de idioma varias veces seguidas
+      wipe.className = "";
+      void wipe.offsetWidth;
+      wipe.className = "run";
+
+      // A mitad de la animacion (pantalla cubierta) cambian los textos
+      langTimer = setTimeout(function () {
+        applyLanguage(newLanguage);
+        langTimer = setTimeout(function () {
+          wipe.className = "";
+        }, 650);
+      }, 380);
     };
 
     // Onda al hacer clic en los botones grandes, pestañas y flechas
